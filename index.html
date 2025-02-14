@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Image Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        #preview {
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Upload a Food Image</h2>
+
+    <input type="file" id="fileInput" accept="image/*">
+    <br><br>
+    <input type="text" id="description" placeholder="Describe your meal (optional)">
+    <br><br>
+    <button onclick="uploadImage()">Upload</button>
+
+    <p id="status"></p>
+    <img id="preview">
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById("fileInput");
+            const description = document.getElementById("description").value;
+            const status = document.getElementById("status");
+
+            if (fileInput.files.length === 0) {
+                status.innerText = "Please select an image.";
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("description", description);
+
+            // Display preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("preview").src = e.target.result;
+                document.getElementById("preview").style.display = "block";
+            };
+            reader.readAsDataURL(file);
+
+            status.innerText = "Uploading...";
+
+            fetch("http://your-server-url/upload", {
+                method: "POST",
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                status.innerText = "Upload Successful! Data Saved.";
+                console.log(data);
+            })
+            .catch(error => {
+                status.innerText = "Upload Failed.";
+                console.error("Error:", error);
+            });
+        }
+    </script>
+
+</body>
+</html>
